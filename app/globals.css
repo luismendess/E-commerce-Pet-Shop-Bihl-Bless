@@ -6,33 +6,78 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 212 72% 32%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 60 67% 86%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
     --radius: 0.5rem;
+  }
+}
+
+@layer components {
+  .recharts-pie-label-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+    fill: hsl(var(--foreground));
+  }
+
+  .recharts-tooltip-item-name {
+    color: hsl(var(--primary)) !important;
+  }
+
+  .recharts-tooltip-item-value {
+    font-weight: 600 !important;
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .recharts-pie-label-text {
+      font-size: 0.65rem !important;
+      transform: translateY(2px);
+    }
+    
+    .recharts-pie-labels {
+      transform: scale(0.9);
+    }
+    
+    .recharts-surface {
+      overflow: visible;
+    }
+  }
+  .recharts-pie-label {
+    font-size: 0.75rem !important;
+    font-weight: 500;
+    fill: hsl(var(--foreground)) !important;
+  }
+
+  @media (min-width: 768px) {
+    .recharts-pie-label {
+      font-size: 0.875rem !important;
+    }
+  }
+  
+  .recharts-surface {
+    overflow: visible !important;
+  }
+}
+
+@layer utilities {
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -40,8 +85,8 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
-

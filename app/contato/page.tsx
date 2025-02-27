@@ -25,6 +25,7 @@ export default function ContactPage() {
                     <Phone className="h-4 w-4" />
                     <a
                       href="https://wa.me/5543998630784"
+                      target="_blank"
                       className="hover:underline"
                     >
                       (43) 9 9863-0784

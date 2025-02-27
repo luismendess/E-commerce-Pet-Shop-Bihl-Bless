@@ -1,29 +1,34 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Minus, Plus, Trash2 } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useCart } from "@/contexts/cart-context"
+import { Button } from "@/components/ui/button";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useCart } from "@/contexts/cart-context";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity } = useCart()
+  const { items, removeItem, updateQuantity } = useCart();
 
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
-  const shipping = 0 // Frete grátis
-  const total = subtotal + shipping
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const shipping = 0; // Frete grátis
+  const total = subtotal + shipping;
 
   if (items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Seu carrinho está vazio</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Seu carrinho está vazio
+          </h2>
           <Button asChild>
             <Link href="/produtos">Continuar Comprando</Link>
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -31,7 +36,10 @@ export default function CartPage() {
       <div className="max-w-4xl mx-auto">
         <div className="space-y-6">
           {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
+            <div
+              key={item.id}
+              className="flex items-center gap-4 p-4 border rounded-lg"
+            >
               <div className="w-20 h-20 relative">
                 <Image
                   src={item.image || "/placeholder.svg"}
@@ -42,14 +50,23 @@ export default function CartPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-medium">{item.name}</h3>
-                <p className="text-sm text-muted-foreground">R$ {item.price.toFixed(2)}</p>
+                <p className="text-sm text-muted-foreground">
+                  R$ {item.price.toFixed(2)}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
+                  onClick={() => {
+                    const newQuantity = item.quantity - 1;
+                    if (newQuantity <= 0) {
+                      removeItem(item.id);
+                    } else {
+                      updateQuantity(item.id, newQuantity);
+                    }
+                  }}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -63,7 +80,12 @@ export default function CartPage() {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeItem(item.id)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => removeItem(item.id)}
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -94,6 +116,5 @@ export default function CartPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

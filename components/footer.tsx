@@ -20,6 +20,7 @@ export default function Footer() {
                 <Phone className="h-4 w-4" />
                 <a
                   href="https://wa.me/5543998630784"
+                  target="_blank"
                   className="hover:underline"
                 >
                   (43) 9 9863-0784
@@ -84,7 +85,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-primary-foreground/10 text-center">
-          <p>&copy; 2024 Pet Shop Bihl Bless. Todos os direitos reservados.</p>
+          <p>&copy; 2025 Pet Shop Bihl Bless. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

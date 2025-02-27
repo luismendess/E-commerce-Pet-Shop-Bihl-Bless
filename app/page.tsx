@@ -1,10 +1,13 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-//import { Bath, DogIcon as DogBowl, Heart, Package, Shirt } from "lucide-react"
-import { Bath } from "lucide-react";
+import { Bath, Scissors, SprayCan } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ProductCarousel } from "@/components/product-carousel";
+//import { ProductCarousel } from "@/components/product-carousel";
+import { useEffect, useState } from "react";
+//import Skeleton from "@/components/ui/skeleton";
 
 const categories = [
   {
@@ -39,49 +42,31 @@ const categories = [
   },
 ];
 
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Ração Premium",
-    price: 89.9,
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 2,
-    name: "Shampoo Antipulgas",
-    price: 39.9,
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 3,
-    name: "Brinquedo Interativo",
-    price: 59.9,
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 4,
-    name: "Cama Ortopédica",
-    price: 199.9,
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 5,
-    name: "Coleira Ajustável",
-    price: 45.9,
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: 6,
-    name: "Petisco Natural",
-    price: 29.9,
-    image: "/placeholder.svg?height=200&width=200",
-  },
-];
-
 export default function Home() {
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const response = await fetch("/api/products/featured");
+        if (!response.ok) throw new Error("Falha ao carregar destaques");
+        const data = await response.json();
+        setFeaturedProducts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Erro desconhecido");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
+
   return (
-    <div className="flex flex-col ">
-      {/* Hero Section */}
+    <div className="flex flex-col">
+      {/* Seção Hero */}
       <section className="bg-primary text-primary-foreground py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -126,23 +111,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Categorias */}
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">Categorias</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 px-2">
+            {" "}
+            {/* Alterado */}
             {categories.map((category) => (
               <Link key={category.name} href={category.href}>
-                <Card className="hover:shadow-lg transition-shadow font-bold border-gray-300">
-                  <CardContent className="p-6 flex flex-col items-center gap-4">
-                    <Image
-                      src={category.image}
-                      alt={category.name}
-                      width={360}
-                      height={360}
-                      className="h-400 w-400 object-cover"
-                    />
-                    <span className="text-center">{category.name}</span>
+                <Card className="hover:shadow-lg transition-shadow font-bold border-gray-300 h-full flex flex-col">
+                  <CardContent className="p-4 flex flex-col items-center gap-3 flex-1">
+                    {" "}
+                    <div className="relative aspect-square w-full min-h-[150px]">
+                      {" "}
+                      <Image
+                        src={category.image}
+                        alt={category.name}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                    <span className="text-center line-clamp-2 leading-tight text-sm px-1 font-medium">
+                      {" "}
+                      {category.name}
+                    </span>
                   </CardContent>
                 </Card>
               </Link>
@@ -151,16 +144,46 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Produtos em Destaque 
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">
             Produtos em Destaque
           </h2>
-          <ProductCarousel products={featuredProducts} />
-        </div>
-      </section>
 
-      {/* Grooming Services */}
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-[400px] w-full rounded-lg" />
+              ))}
+            </div>
+          )}
+
+          {error && (
+            <div className="text-center text-destructive">
+              <p>Erro ao carregar produtos: {error}</p>
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
+                Tentar novamente
+              </Button>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <ProductCarousel
+              products={featuredProducts.map((product) => ({
+                ...product,
+                image: product.image || "/placeholder.svg",
+              }))}
+            />
+          )}
+        </div>
+      </section>*/}
+
+      {/* Seção Banho e Tosa */}
       <section className="py-16 bg-slate-100 text-slate-800">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -184,7 +207,7 @@ export default function Home() {
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Bath className="h-8 w-8 text-primary" />
+                  <Scissors className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Tosa Profissional</h3>
                 <p className="text-sm text-slate-600">
@@ -194,7 +217,7 @@ export default function Home() {
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Bath className="h-8 w-8 text-primary" />
+                  <SprayCan className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Hidratação</h3>
                 <p className="text-sm text-slate-600">

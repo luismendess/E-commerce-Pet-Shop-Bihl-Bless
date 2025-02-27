@@ -1,196 +1,229 @@
-# Petshop Bihlbless
+# Pet Shop Bihl Bless - Plataforma E-commerce
 
-Um e-commerce completo de petshop desenvolvido com Next.js, React e TypeScript.
+## Sobre o Projeto
 
-## Guia Completo de Instalação e Configuração
+Sistema de e-commerce desenvolvido para o Pet Shop Bihl Bless, como extensão à matéria Dsenvolvimento de Aplicações Web, utilizando Next.js 15.1.7, React 19, Prisma e MySQL.
+A plataforma oferece gerenciamento completo de produtos, sistema de autenticação, carrinho de compras e painel administrativo.
 
-### 1. Preparação do Ambiente de Desenvolvimento
+## Tecnologias Principais
 
-#### Instalando Node.js (Necessário para executar o projeto)
-1. Acesse [Node.js](https://nodejs.org/)
-2. Baixe a versão LTS (Long Term Support) - Recomendada para maior estabilidade
-3. Execute o instalador:
-   - Windows: Next > Next > Finish
-   - Mac: Siga as instruções do instalador
-   - Linux: Use o gerenciador de pacotes da sua distribuição ou nvm
-4. Verifique a instalação abrindo o terminal (Command Prompt no Windows) e digite:
-```bash
-node --version  # Deve mostrar algo como v18.x.x
-npm --version   # Deve mostrar algo como 8.x.x
+- Next.js 15.1.7
+- React 19.0.0
+- Prisma 6.4.1
+- MySQL
+- NextAuth.js 4.24.11
+- Tailwind CSS 3.4.1
+- Typescript 5.7.3
+
+## Pré-requisitos
+
+### Requisitos de Sistema
+
+1. Node.js (versão 18.x ou superior)
+2. MySQL (versão 8.0 ou superior)
+3. Git
+
+### Ferramentas Recomendadas
+
+- Visual Studio Code
+- MySQL Workbench (para gerenciamento do banco de dados)
+- Insomnia ou Postman (para testar as APIs)
+
+## Instalação
+
+### 1. Preparando o Ambiente MySQL
+
+```sql
+-- Acessar o MySQL
+mysql -u root -p
+
+-- Criar o banco de dados
+CREATE DATABASE petshop;
 ```
 
-#### Instalando Git (Necessário para baixar o projeto)
-1. Acesse [Git](https://git-scm.com/)
-2. Baixe e instale:
-   - Windows: Mantenha as opções padrão durante a instalação
-   - Mac: Use o instalador .dmg
-   - Linux: Use `sudo apt-get install git` (Ubuntu/Debian)
-3. Configure seu Git (substitua com suas informações):
-```bash
-git config --global user.name "Seu Nome"
-git config --global user.email "seu@email.com"
-```
-
-### 2. Configurando o Projeto
-
-#### Clonando o Repositório
-```bash
-# Navegue até a pasta onde quer o projeto
-cd Documents  # ou outro local de sua preferência
-
-# Clone o repositório
-git clone [URL do seu repositório]
-
-# Entre na pasta do projeto
-cd petshop_bihlbless
-```
-
-#### Instalando Dependências
-Abra o terminal na pasta do projeto e execute os comandos na ordem:
+### 2. Clonando e Instalando o Projeto
 
 ```bash
-# Instala todas as dependências listadas no package.json
+# Clonar o repositório
+git clone [URL_DO_REPOSITÓRIO]
+cd petshop
+
+# Instalar dependências
 npm install
-
-# Caso algumas dependências específicas não estejam no package.json:
-npm install next@latest react@latest react-dom@latest
-npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
-npm install @types/node @types/react @types/react-dom typescript
-npm install @radix-ui/react-icons
-npm install @radix-ui/react-slot
-npm install clsx
-npm install lucide-react
-npm install tailwind-merge
 ```
 
-#### Configurando Variáveis de Ambiente
-1. Crie um arquivo chamado `.env.local` na raiz do projeto
-2. Adicione as variáveis necessárias:
+### 3. Configuração do Ambiente
+
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+
 ```env
-NEXT_PUBLIC_API_URL=sua_url_api
-# Adicione outras variáveis conforme necessário
+DATABASE_URL="mysql://root:SUA_SENHA@localhost:3306/petshop"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="GERE_UMA_CHAVE_SECRETA"
 ```
 
-### 3. Estrutura do Projeto Explicada
-
-```
-petshop_bihlbless/
-├── app/                    # Páginas e rotas da aplicação
-│   ├── carrinho/          # Página do carrinho
-│   ├── contato/           # Página de contato
-│   ├── login/             # Página de login
-│   ├── produtos/          # Páginas de produtos
-│   └── layout.tsx         # Layout principal
-├── components/            # Componentes reutilizáveis
-│   ├── ui/               # Componentes de interface
-│   ├── cart-badge.tsx    # Badge do carrinho
-│   ├── footer.tsx        # Rodapé
-│   └── header.tsx        # Cabeçalho
-├── contexts/             # Contextos do React
-│   └── cart-context.tsx  # Contexto do carrinho
-├── hooks/                # Hooks personalizados
-├── lib/                  # Utilitários
-└── public/              # Arquivos estáticos
-    └── images/          # Imagens do projeto
-```
-
-### 4. Executando o Projeto
+### 4. Configuração do Banco de Dados
 
 ```bash
-# Inicia o servidor de desenvolvimento
-npm run dev
+# Gerar o cliente Prisma
+npx prisma generate
 
-# O site estará disponível em http://localhost:3000
+# Executar as migrações
+npx prisma migrate dev
+
+# (Opcional) Popular o banco com dados iniciais
+npx prisma db seed
 ```
 
-### 5. Comandos Úteis
+### 5. Iniciando o Projeto
 
 ```bash
-# Inicia o servidor de desenvolvimento
+# Iniciar em modo desenvolvimento
 npm run dev
 
-# Cria uma build de produção
+# O projeto estará disponível em http://localhost:3000
+```
+
+## Estrutura do Projeto
+
+### Diretórios Principais
+
+```
+petshop/
+├─ app/                    # Rotas e páginas
+│  ├─ admin/              # Área administrativa
+│  ├─ api/                # Endpoints da API
+│  ├─ produtos/           # Páginas de produtos
+│  └─ layout.tsx          # Layout principal
+├─ components/            # Componentes React
+├─ contexts/              # Contextos (carrinho, usuário)
+├─ hooks/                 # Hooks personalizados
+├─ lib/                   # Utilitários
+├─ prisma/               # Configuração do banco
+└─ public/               # Arquivos estáticos
+```
+
+### Estrutura do Banco de Dados
+
+O projeto utiliza dois modelos principais:
+
+1. User (Usuários)
+
+```prisma
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  isAdmin   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  lastLogin DateTime?
+  products  Product[]
+}
+```
+
+2. Product (Produtos)
+
+```prisma
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  description String?
+  image       String?
+  category    String
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  user        User     @relation(fields: [createdBy], references: [id])
+}
+```
+
+## Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+npm run dev
+
+# Construir para produção
 npm run build
 
-# Inicia o servidor de produção
-npm start
+# Iniciar em produção
+npm run start
 
-# Executa o linter
+# Verificar qualidade do código
 npm run lint
 ```
 
-### 6. Solução de Problemas Comuns
+## Deploy
 
-#### Erro: Module not found
+### Preparação para Produção
+
+1. Configure um servidor MySQL
+
+   - Recomendamos serviços como AWS RDS, DigitalOcean ou PlanetScale
+   - Atualize a variável DATABASE_URL com a nova conexão
+
+2. Deploy no Vercel
+
+   - Conecte seu repositório GitHub
+   - Configure as variáveis de ambiente:
+     - DATABASE_URL
+     - NEXTAUTH_SECRET
+     - NEXTAUTH_URL
+
+3. Execute as migrações no banco de produção
+
 ```bash
-# Limpe o cache e reinstale as dependências
+npx prisma migrate deploy
+```
+
+### Backup do Banco de Dados
+
+```bash
+# Exportar
+mysqldump -u root -p petshop > backup.sql
+
+# Importar
+mysql -u root -p petshop < backup.sql
+```
+
+## Solução de Problemas Comuns
+
+### Erro de Conexão com o Banco
+
+1. Verifique se o MySQL está rodando
+2. Confirme as credenciais no .env
+3. Teste a conexão:
+
+```bash
+mysql -u root -p
+```
+
+### Erro nas Migrações do Prisma
+
+```bash
+# Resetar o banco (cuidado: apaga dados)
+npx prisma migrate reset
+
+# Verificar status
+npx prisma migrate status
+```
+
+### Problemas com Dependências
+
+```bash
+# Limpar cache do npm
 npm cache clean --force
+
+# Reinstalar dependências
 rm -rf node_modules
 rm -rf .next
 npm install
 ```
 
-#### Erro com Imagens
-1. Verifique se o caminho está correto:
-   - Correto: `/images/logo.jpg`
-   - Incorreto: `@/public/images/logo.jpg`
-2. Verifique se a imagem existe na pasta correta
-3. Certifique-se que está usando o componente Image corretamente:
-```jsx
-import Image from 'next/image'
+## Licença
 
-<Image
-  src="/images/logo.jpg"
-  alt="Descrição"
-  width={80}
-  height={80}
-/>
-```
-
-#### Erro: TypeScript
-1. Verifique se os tipos estão instalados:
-```bash
-npm install -D @types/react @types/node @types/react-dom
-```
-2. Certifique-se que o `tsconfig.json` está configurado corretamente
-
-#### Erro no Tailwind
-1. Verifique se o arquivo `tailwind.config.js` existe
-2. Recrie o arquivo de configuração:
-```bash
-npx tailwindcss init -p
-```
-
-### 7. Tecnologias Utilizadas
-
-- **Next.js**: Framework React para produção
-- **React**: Biblioteca para construção de interfaces
-- **TypeScript**: Superset JavaScript com tipagem
-- **Tailwind CSS**: Framework CSS utilitário
-- **Radix UI**: Componentes primitivos acessíveis
-- **Lucide React**: Biblioteca de ícones
-- **Clsx**: Utilitário para construção de classes condicionais
-
-### 8. Manutenção e Atualizações
-
-Para manter o projeto atualizado:
-```bash
-# Verifica atualizações disponíveis
-npm outdated
-
-# Atualiza todas as dependências
-npm update
-
-# Atualiza uma dependência específica
-npm install [nome-do-pacote]@latest
-```
-
-### 9. Suporte e Contribuição
-
-Para reportar problemas ou sugerir melhorias:
-1. Abra uma issue no GitHub
-2. Descreva detalhadamente o problema ou sugestão
-3. Inclua passos para reproduzir o problema
-4. Adicione screenshots se necessário
-
-Para mais informações ou dúvidas, entre em contato através das issues do GitHub.
+Este projeto é privado e proprietário. Todos os direitos reservados.

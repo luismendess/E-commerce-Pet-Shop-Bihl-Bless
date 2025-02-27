@@ -39,3 +39,56 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Variáveis de ambiente
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+
+# Banco de dados
+/prisma/migrations/
+/prisma/dev.db
+
+# Arquivos de upload
+/public/uploads/
+
+# Dependências
+/node_modules/
+.pnp
+.pnp.js
+
+# Building
+/.next/
+/build/
+/dist/
+/out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Arquivos do sistema
+.DS_Store
+*.pem
+Thumbs.db
+
+# Arquivos de IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Arquivos de teste e cobertura
+/coverage
+/.nyc_output
+
+# Arquivos temporários
+*.log
+*.tmp

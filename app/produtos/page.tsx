@@ -1,6 +1,8 @@
 "use client";
 
 import { ProductCard } from "@/components/product-card";
+import Skeleton from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -10,96 +12,127 @@ import {
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
-const products = [
-  {
-    id: 1,
-    name: "Ração Premium",
-    price: 129.9,
-    category: "racoes-petiscos",
-    image: "/images/produtos/racao-premium.jpg",
-  },
-  {
-    id: 2,
-    name: "Shampoo Antipulgas",
-    price: 39.9,
-    category: "farmacia-higiene",
-    image: "/images/produtos/shampoo-antipulgas.JPG",
-  },
-  {
-    id: 3,
-    name: "Coleira de Couro",
-    price: 59.9,
-    category: "coleiras-guias",
-    image: "/images/produtos/coleira-couro.jpg",
-  },
-  {
-    id: 4,
-    name: "Ração Filhotes",
-    price: 89.9,
-    category: "racoes-petiscos",
-    image: "/images/produtos/racao-filhotes.JPG",
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image: string | null;
+  stock: number;
+}
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState("todas");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products");
+        if (!response.ok) throw new Error("Falha ao carregar produtos");
+        const data = await response.json();
+        setProducts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Erro desconhecido");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
     const category = searchParams.get("categoria");
-    if (category) {
-      setSelectedCategory(category);
-    }
+    if (category) setSelectedCategory(category);
   }, [searchParams]);
 
-  // Filtramos os produtos baseado na categoria selecionada
-  const filteredProducts =
-    selectedCategory === "todas"
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
+  const filteredProducts = products.filter(
+    (product) =>
+      selectedCategory === "todas" || product.category === selectedCategory
+  );
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <Skeleton key={i} className="h-[400px] w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center text-destructive">
+        <p>Erro: {error}</p>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          Tentar novamente
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Produtos</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h1 className="text-3xl font-bold">Nossos Produtos</h1>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[240px]">
             <SelectValue placeholder="Filtrar por categoria" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todas">Todas as categorias</SelectItem>
+            <SelectItem value="todas">Todas as Categorias</SelectItem>
             <SelectItem value="racoes-petiscos">Rações e Petiscos</SelectItem>
             <SelectItem value="farmacia-higiene">Farmácia e Higiene</SelectItem>
             <SelectItem value="coleiras-guias">Coleiras e Guias</SelectItem>
             <SelectItem value="camas-casas">Camas e Casas</SelectItem>
-            <SelectItem value="roupas-brinquedos">
-              Roupas e Brinquedos
-            </SelectItem>
+            <SelectItem value="roupas-brinquedos">Roupas e Brinquedos</SelectItem>
             <SelectItem value="diversos">Diversos</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* 
-        Usamos um operador ternário para decidir se mostramos os produtos
-        ou a mensagem de "sem produtos". A mensagem aparece centralizada
-        na tela com um estilo amigável.
-      */}
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} {...product} />
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              category={product.category}
+              image={product.image}
+              stock={product.stock}
+            />
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-          <p className="text-xl text-gray-600 mb-2">
-            Estamos sem produtos desse tipo no momento, sentimos muito.
-          </p>
-          <p className="text-gray-500">
-            Mas estamos providenciando o mais rápido possível!
-          </p>
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+          <div className="max-w-md space-y-4">
+            <h2 className="text-2xl font-bold text-muted-foreground">
+              Nenhum produto encontrado
+            </h2>
+            <p className="text-muted-foreground">
+              {selectedCategory === "todas"
+                ? "Estamos reabastecendo nosso estoque!"
+                : `Não encontramos produtos na categoria "${selectedCategory.replace(
+                    /-/g,
+                    " "
+                  )}"`}
+            </p>
+          </div>
         </div>
       )}
     </div>

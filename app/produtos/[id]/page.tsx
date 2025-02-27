@@ -2,46 +2,72 @@
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Star } from "lucide-react";
 import { useAddToCart } from "@/hooks/use-add-to-cart";
-import { cn } from "@/lib/utils";
 import { Truck, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { use } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-export default function ProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const resolvedParams = use(params);
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image: string | null;
+  stock: number;
+  description: string;
+}
+
+export default function ProductPage() {
   const addToCart = useAddToCart();
   const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const product = {
-    id: Number.parseInt(resolvedParams.id),
-    name: "Ração Premium",
-    price: 89.9,
-    rating: 4,
-    reviewCount: 128,
-    description:
-      "Ração premium de alta qualidade para cães adultos. Formulada com ingredientes naturais e balanceados para uma nutrição completa.",
-    images: [
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-    ],
-  };
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        if (!params?.id) return;
+
+        const productId = params.id.toString();
+        const response = await fetch(`/api/products/${productId}`);
+
+        if (!response.ok) throw new Error("Falha ao carregar produto");
+
+        const data = await response.json();
+        setProduct(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Erro desconhecido");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [params?.id]);
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (error) {
+    return <div>Erro: {error}</div>;
+  }
+
+  if (!product) {
+    return <div>Produto não encontrado</div>;
+  }
 
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.images[0],
+      image: product.image || "/placeholder.svg",
     });
-    toast.success("Produto adicionado ao carrinho!");
   };
 
   const handleBuyNow = () => {
@@ -49,9 +75,8 @@ export default function ProductPage({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.images[0],
+      image: product.image || "/placeholder.svg",
     });
-    toast.success("Produto adicionado ao carrinho!");
     router.push("/carrinho");
   };
 
@@ -61,51 +86,23 @@ export default function ProductPage({
         <div className="space-y-4">
           <div className="aspect-square relative">
             <Image
-              src={product.images[0] || "/placeholder.svg"}
+              src={product.image || "/placeholder.svg"}
               alt={product.name}
               fill
               className="object-cover rounded-lg"
             />
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {product.images.map((image, index) => (
-              <div key={index} className="aspect-square relative">
-                <Image
-                  src={image || "/placeholder.svg"}
-                  alt={`${product.name} ${index + 1}`}
-                  fill
-                  className="object-cover rounded-lg"
-                />
-              </div>
-            ))}
           </div>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-4">
             <h1 className="text-2xl font-bold">{product.name}</h1>
-
-            <div className="flex items-center gap-2">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={cn(
-                    "w-5 h-5",
-                    i < product.rating
-                      ? "fill-primary text-primary"
-                      : "fill-muted text-muted-foreground"
-                  )}
-                />
-              ))}
-              <span className="text-muted-foreground">
-                ({product.reviewCount} avaliações)
-              </span>
-            </div>
-
             <div className="text-3xl font-bold text-primary">
-              R$ {product.price.toFixed(2)}
+              {product.price.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
             </div>
-
             <p className="text-muted-foreground">{product.description}</p>
           </div>
 

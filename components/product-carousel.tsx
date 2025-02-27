@@ -1,85 +1,47 @@
-"use client"
+"use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ProductCard } from "@/components/product-card"
-import { useEffect, useState } from "react"
-import { cn } from "@/lib/utils"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
+import { ProductCard } from "./product-card";
 
-interface Product {
-  id: number
-  name: string
-  price: number
-  image: string
-}
-
-interface ProductCarouselProps {
-  products: Product[]
-}
-
-export function ProductCarousel({ products }: ProductCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
-  const itemsToShow = 4
-
-  const nextSlide = () => {
-    setCurrentIndex((current) => (current + itemsToShow >= products.length ? 0 : current + itemsToShow))
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((current) => (current === 0 ? products.length - itemsToShow : current - itemsToShow))
-  }
-
-  useEffect(() => {
-    if (isHovered) return
-
-    const interval = setInterval(nextSlide, 5000)
-    return () => clearInterval(interval)
-  }, [isHovered]) // Removed nextSlide and products from dependencies
+export function ProductCarousel({ products }: { products: any[] }) {
+  const autoplay = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }));
 
   return (
-    <div className="relative" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      <div className="overflow-hidden">
-        <div
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
-        >
+    <div
+      onMouseEnter={autoplay.current.stop}
+      onMouseLeave={autoplay.current.reset}
+    >
+      <Carousel
+        plugins={[autoplay.current]}
+        options={{
+          align: "start",
+          loop: true,
+          containScroll: "trimSnaps",
+        }}
+      >
+        <CarouselContent>
           {products.map((product) => (
-            <div key={product.id} className="min-w-[25%] px-3">
-              <ProductCard {...product} />
-            </div>
+            <CarouselItem
+              key={product.id}
+              className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+            >
+              <ProductCard
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                category={product.category}
+                image={product.image}
+              />
+            </CarouselItem>
           ))}
-        </div>
-      </div>
-
-      <Button
-        variant="outline"
-        size="icon"
-        className={cn(
-          "absolute -left-4 top-1/2 -translate-y-1/2",
-          "h-8 w-8 rounded-full",
-          "opacity-0 transition-opacity",
-          isHovered && "opacity-100",
-        )}
-        onClick={prevSlide}
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant="outline"
-        size="icon"
-        className={cn(
-          "absolute -right-4 top-1/2 -translate-y-1/2",
-          "h-8 w-8 rounded-full",
-          "opacity-0 transition-opacity",
-          isHovered && "opacity-100",
-        )}
-        onClick={nextSlide}
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
+        </CarouselContent>
+      </Carousel>
     </div>
-  )
+  );
 }
-
